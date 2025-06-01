@@ -58,7 +58,7 @@ char *readInput(size_t *bufferSize)
   if (inputSize == -1)
   {
     free(buffer);
-    exit(0);
+    return NULL;
   }
 
   if (buffer[inputSize - 1] == '\n')
