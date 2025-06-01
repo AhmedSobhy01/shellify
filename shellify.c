@@ -4,6 +4,7 @@
 
 char **paths = NULL;
 int pathsCount = 0;
+pid_t currentRunningPGroup = -1;
 
 char *readInput(size_t *bufferSize);
 char *checkForRedirection(char **args, int *argsCount);
@@ -23,10 +24,21 @@ int main(int argc, char *argv[])
   size_t bufferSize = 0;
   char *buffer;
 
+  // Set up signal handlers for SIGINT and SIGTERM
+  signal(SIGINT, signalHandler);
+  signal(SIGTERM, signalHandler);
+
   // Main loop
   while (1)
   {
     buffer = readInput(&bufferSize);
+
+    if (buffer == NULL)
+    {
+      printf("\n");
+      exitShellify(buffer, stdin);
+    }
+
     processCommand(buffer, bufferSize);
     free(buffer);
   }
@@ -134,8 +146,10 @@ void executeCommand(char **args)
   else if (pid > 0)
   {
     // Parent process
+    currentRunningPGroup = pid;
     int status;
     waitpid(pid, &status, 0);
+    currentRunningPGroup = -1;
   }
   else
   {
@@ -179,8 +193,10 @@ int processCommand(char *buffer, size_t bufferSize)
   else if (pid > 0)
   {
     // Parent process
+    currentRunningPGroup = pid;
     int status;
     waitpid(pid, &status, 0);
+    currentRunningPGroup = -1;
   }
   else
   {
