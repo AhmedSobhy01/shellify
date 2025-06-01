@@ -60,12 +60,39 @@ void setUpRedirectionFile(char *redirectFile)
 
 void runFromPath(char *command, char **args)
 {
+  // Check if command is from path
+  if (command[0] == '/' || strchr(command, '/') != NULL)
+  {
+    if (access(command, X_OK) == 0)
+    {
+      execv(command, args);
+      fprintf(stderr, "Error: Failed to execute command '%s'\n", command);
+      exit(1);
+    }
+  }
+  else // Check if command is in current directory
+  {
+    char *curDirPath = malloc(strlen(command) + 3);
+    strcpy(curDirPath, "./");
+    strcat(curDirPath, command);
+
+    if (access(curDirPath, X_OK) == 0)
+    {
+      execv(curDirPath, args);
+      fprintf(stderr, "Error: Failed to execute command '%s'\n", curDirPath);
+      free(curDirPath);
+      exit(1);
+    }
+    free(curDirPath);
+  }
+
+  // Try paths in PATH
   for (int i = 0; i < pathsCount; i++)
   {
-    char *fullPath = malloc(strlen(paths[i]) + strlen(args[0]) + 2);
+    char *fullPath = malloc(strlen(paths[i]) + strlen(command) + 2);
     strcpy(fullPath, paths[i]);
     strcat(fullPath, "/");
-    strcat(fullPath, args[0]);
+    strcat(fullPath, command);
 
     // Check if exists, execute
     if (access(fullPath, X_OK) == 0)
@@ -73,14 +100,14 @@ void runFromPath(char *command, char **args)
       execv(fullPath, args);
 
       // Execv failed
-      fprintf(stderr, "Error: Failed to execute command '%s'\n", args[0]);
+      fprintf(stderr, "Error: Failed to execute command '%s'\n", command);
     }
 
     free(fullPath);
   }
 
   // Command not found
-  fprintf(stderr, "Error: Command '%s' not found in PATH\n", args[0]);
+  fprintf(stderr, "Error: Command '%s' not found in current directory or PATH\n", command);
 
   exit(1);
 }
