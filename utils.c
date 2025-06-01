@@ -6,6 +6,12 @@ char **parseArguments(char *buffer, size_t *bufferSize, int *argsCount)
   (*argsCount) = 0;
   int argsSize = 10;
   char **args = malloc(argsSize * sizeof(char *));
+  if (!args)
+  {
+    fprintf(stderr, "Error: Failed to allocate memory for arguments\n");
+    return NULL;
+  }
+
   char *token = strtok(buffer, " ");
 
   while (token != NULL)
