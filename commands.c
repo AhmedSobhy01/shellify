@@ -10,7 +10,7 @@ void setCurrentDirectory(char *path)
     ret = chdir(path);
 
   if (ret != 0)
-    fprintf(stderr, "Invalid path!\n");
+    fprintf(stderr, "Error: Cannot change directory to '%s': No such file or directory\n", path ? path : "HOME");
 }
 
 void printCurrentDirectory()
@@ -44,13 +44,13 @@ void setUpRedirectionFile(char *redirectFile)
 
   if (fd < 0)
   {
-    fprintf(stderr, "An error has occurred!\n");
+    fprintf(stderr, "Error: Cannot open redirection file '%s'\n", redirectFile);
     exit(1);
   }
 
   if (dup2(fd, STDOUT_FILENO) < 0)
   {
-    fprintf(stderr, "An error has occurred!\n");
+    fprintf(stderr, "Error: Failed to redirect output to file '%s'\n", redirectFile);
     close(fd);
     exit(1);
   }
@@ -73,14 +73,14 @@ void runFromPath(char *command, char **args)
       execv(fullPath, args);
 
       // Execv failed
-      fprintf(stderr, "An error has occurred!\n");
+      fprintf(stderr, "Error: Failed to execute command '%s'\n", args[0]);
     }
 
     free(fullPath);
   }
 
   // Command not found
-  fprintf(stderr, "An error has occurred!\n");
+  fprintf(stderr, "Error: Command '%s' not found in PATH\n", args[0]);
 
   exit(1);
 }

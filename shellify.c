@@ -84,7 +84,7 @@ char *checkForRedirection(char **args, int *argsCount)
       }
       else
       {
-        fprintf(stderr, "An error has occurred!\n");
+        fprintf(stderr, "Error: Redirection '>' requires a filename\n");
         return NULL;
       }
       break;
@@ -104,7 +104,7 @@ int handleBuiltInCommands(char **args, int argsCount)
   {
     if (argsCount > 1)
     {
-      fprintf(stderr, "An error has occurred!\n");
+      fprintf(stderr, "Error: 'exit' command takes no arguments\n");
       return 1;
     }
     exit(0);
@@ -113,7 +113,7 @@ int handleBuiltInCommands(char **args, int argsCount)
   {
     if (argsCount > 2)
     {
-      fprintf(stderr, "An error has occurred!\n");
+      fprintf(stderr, "Error: 'cd' command takes at most one argument\n");
       return 1;
     }
     setCurrentDirectory(argsCount > 1 ? args[1] : NULL);
@@ -154,7 +154,7 @@ void executeCommand(char **args)
   else
   {
     // Fork failed
-    fprintf(stderr, "An error has occurred!\n");
+    fprintf(stderr, "Error: Failed to create child process\n");
   }
 }
 
@@ -201,7 +201,7 @@ int processCommand(char *buffer, size_t bufferSize)
   else
   {
     // Fork failed
-    fprintf(stderr, "An error has occurred!\n");
+    fprintf(stderr, "Error: Failed to create child process\n");
   }
 
   free(args);
