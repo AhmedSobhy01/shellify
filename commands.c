@@ -3,10 +3,14 @@
 
 void setCurrentDirectory(char *path)
 {
+  int ret;
   if (path == NULL)
-    chdir(getenv("HOME"));
+    ret = chdir(getenv("HOME"));
   else
-    chdir(path);
+    ret = chdir(path);
+
+  if (ret != 0)
+    fprintf(stderr, "Invalid path!\n");
 }
 
 void printCurrentDirectory()
